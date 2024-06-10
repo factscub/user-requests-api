@@ -86,24 +86,35 @@ export class ApplicationService {
   ): Promise<Application> {
     const application = await this.getApplicationById(id);
     const { status, comment } = updateApplicationDto;
-    if (application.status === ApplicationStatus.resolved) {
-      throw new BadRequestException(
-        `Application with ID "${application.id}" has already been "Resolved"`,
-      );
-    } else if (status === ApplicationStatus.resolved) {
-      application.status = status;
-      application.comment = comment;
-      await this.applicationRepository.save(application);
+    const statusFound = ApplicationStatus[status];
+    const resolvedStatus = ApplicationStatus.resolved;
 
-      // Send email notification if resolved
-      await this.emailService.sendNotificationEmail(
-        application.email,
-        'Application Resolved',
-        TemplatesNames.APPLICATION_RESOLVED,
-        application,
-      );
+    if (statusFound) {
+      if (application.status === resolvedStatus) {
+        throw new BadRequestException(
+          `Application with ID "${application.id}" has already been "resolved"`,
+        );
+      } else if (status === resolvedStatus.toLowerCase()) {
+        application.status = resolvedStatus;
+        application.comment = comment;
+        await this.applicationRepository.save(application);
+
+        // Send email notification if resolved
+        await this.emailService.sendNotificationEmail(
+          application.email,
+          'Application Resolved',
+          TemplatesNames.APPLICATION_RESOLVED,
+          application,
+        );
+      } else {
+        throw new BadRequestException(
+          'Status must be "resolved" (case-sensitive)',
+        );
+      }
     } else {
-      throw new BadRequestException('Status must be "resolved"');
+      throw new BadRequestException(
+        'Status must be "resolved" (case-sensitive)',
+      );
     }
 
     return application;
@@ -158,7 +169,7 @@ export class ApplicationService {
             query.andWhere('application.status = :status', { status });
           } else {
             throw new BadRequestException(
-              'Status must be "active or resolved"',
+              'Status must be "active or resolved" (case-sensitive)',
             );
           }
           break;
@@ -167,7 +178,9 @@ export class ApplicationService {
           if (orderBy) {
             query.orderBy('application.updated_at', orderBy);
           } else {
-            throw new BadRequestException('orderByDate must be "asc or desc"');
+            throw new BadRequestException(
+              'orderByDate must be "asc or desc" (case-sensitive)',
+            );
           }
           break;
         // Add more cases for additional parameters
