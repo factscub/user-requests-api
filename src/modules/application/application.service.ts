@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -7,7 +8,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CreateApplicationDto } from './dto/createApplication.dto';
 import { UpdateApplicationDto } from './dto/updateApplication.dto';
 import { Application } from './entities/application.entity';
-import { EmailService } from 'src/modules/email/email.service';
+import { RealEmailService } from 'src/modules/email/realEmail.service';
+import { NullEmailService } from '../email/nullEmail.service';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import {
   ApplicationStatus,
@@ -29,7 +31,8 @@ export class ApplicationService {
   constructor(
     @InjectRepository(Application)
     private applicationRepository: Repository<Application>,
-    private emailService: EmailService,
+    @Inject('EMAIL_SERVICE')
+    private readonly emailService: RealEmailService | NullEmailService,
   ) {}
 
   /**
