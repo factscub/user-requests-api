@@ -13,6 +13,12 @@ $ cp .env.example .env
 ```bash
 copy .env.example .env
 ```
+
+## Mail service configuration
+
+### By default emails will be stored as plain text files inside the `emailFiles` directory as `USE_NULL_EMAIL_SERVICE` value is `true` .
+### If you want to use some mail service, setup the env values and must set `USE_NULL_EMAIL_SERVICE` value as `false` in .env file.
+
 ## Installation
 
 ```bash
