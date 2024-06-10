@@ -14,7 +14,7 @@ bethasiva7780@gmail.com
 http://localhost:8000
 ```
 
-### Production
+### Production (Since the hosting is free, Free instances spin down after periods of inactivity. So please wait for about 1-2 minutes after visiting the URL for the first time)
 
 ```bash
 https://user-requests-api.onrender.com
